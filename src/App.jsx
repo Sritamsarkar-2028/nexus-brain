@@ -1,8 +1,15 @@
+import Shell from './components/layout/Shell'
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <h1 className="text-3xl font-bold text-indigo-600">Nexus Brain</h1>
-    </div>
+    <Shell>
+      <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-100">
+        Dashboard
+      </h1>
+      <p className="text-sm text-gray-400 mt-1">
+        Actions that need your attention.
+      </p>
+    </Shell>
   )
 }
 
