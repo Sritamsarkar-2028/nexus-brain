@@ -17,11 +17,11 @@ const INITIAL_MESSAGES = [
 
 const MOCK_RESPONSES = {
   'What did Priya last say about the Atlas API?':
-    'Priya\'s last message was on Slack (Apr 30, 4:12pm) — she said the spec looks good overall but needs confirmation on the auth endpoint and rate limits before the sprint starts. She also emailed this morning flagging the same two items for sign-off.',
+    'Priya\'s last message was on Slack (Apr 30, 4:12pm) — she said the spec looks good overall but needs confirmation on the auth endpoint and rate limits before the sprint starts. She also emailed this morning flagging the same two items for sign-off. The Notion spec was last updated Apr 29.',
   'What are the Sprint #18 blockers?':
     'Ankit flagged 3 blockers on Slack (Apr 30): loading state design on the entity graph, API error boundary UI, and the auth redirect flow. None have an assigned owner yet. Deadline is May 9.',
   'Where is the Q2 retention data?':
-    'The retention data lives in the "Q2 Analytics" Notion page, last updated May 1 by Ankit. There\'s also a chart export in the Slack thread between you and Ankit from Apr 30.',
+    'The retention data lives in the "Q2 Analytics" Notion page, last updated May 1 by Ankit. There\'s also a chart export in the Slack thread between you and Ankit from Apr 30. CEO Rahul asked for this in an email this morning.',
   'Summarize my last 3 emails from Rahul':
     'Rahul\'s last 3 emails: (1) Today 7:52am — requesting the retention slide for Q2 deck by EOD. (2) Apr 29 — asked for sprint status update before board meeting. (3) Apr 27 — shared investor deck draft for review.',
 }
@@ -51,6 +51,7 @@ function Message({ message }) {
       </div>
     )
   }
+
   return (
     <div className="flex justify-end">
       <div className="bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed max-w-prose">
@@ -92,13 +93,16 @@ export default function ChatPanel() {
 
   const sendMessage = (text) => {
     if (!text.trim()) return
+
     const userMsg = { id: Date.now(), role: 'user', text }
     setMessages(prev => [...prev, userMsg])
     setInput('')
     setTyping(true)
+
     setTimeout(() => {
       const response = MOCK_RESPONSES[text] ||
         'I searched across Gmail, Slack, and Notion. Let me surface the most relevant context for that query — connecting to your sources now.'
+
       const aiMsg = {
         id: Date.now() + 1,
         role: 'ai',
@@ -112,12 +116,15 @@ export default function ChatPanel() {
 
   return (
     <div className="flex flex-col h-[600px]">
+
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-4 pb-4">
         {messages.map(m => <Message key={m.id} message={m} />)}
         {typing && <TypingIndicator />}
         <div ref={bottomRef} />
       </div>
 
+      {/* Suggested questions */}
       {messages.length === 1 && (
         <div className="mb-3">
           <p className="text-xs text-gray-400 mb-2">Suggested</p>
@@ -135,6 +142,7 @@ export default function ChatPanel() {
         </div>
       )}
 
+      {/* Input */}
       <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
         <input
           type="text"
@@ -152,6 +160,7 @@ export default function ChatPanel() {
           Ask
         </button>
       </div>
+
     </div>
   )
 }

@@ -83,34 +83,52 @@ const SOURCE_COLORS = {
 
 function EntityCard({ entity }) {
   const totalMentions = entity.sources.reduce((acc, s) => acc + s.count, 0)
+
   return (
     <div className={`
       bg-white dark:bg-gray-900 rounded-xl
       border border-gray-200 dark:border-gray-700
       p-4 transition-all duration-200
-      hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm cursor-pointer
+      hover:border-gray-300 dark:hover:border-gray-600
+      hover:shadow-sm cursor-pointer
       ${entity.urgent ? 'border-l-4 border-l-indigo-400' : ''}
     `}>
+
+      {/* Header */}
       <div className="flex items-start justify-between gap-2 mb-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">{entity.name}</h3>
-          <span className={`inline-block text-xs px-2 py-0.5 rounded-full border mt-1 ${TYPE_COLORS[entity.type]}`}>
+          <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+            {entity.name}
+          </h3>
+          <span className={`
+            inline-block text-xs px-2 py-0.5 rounded-full border mt-1
+            ${TYPE_COLORS[entity.type]}
+          `}>
             {entity.type}
           </span>
         </div>
         <div className="text-right flex-shrink-0">
-          <div className="text-lg font-semibold text-gray-700 dark:text-gray-200">{totalMentions}</div>
+          <div className="text-lg font-semibold text-gray-700 dark:text-gray-200">
+            {totalMentions}
+          </div>
           <div className="text-xs text-gray-400">mentions</div>
         </div>
       </div>
+
+      {/* Sources */}
       <div className="flex items-center gap-1.5 flex-wrap mb-3">
         {entity.sources.map(src => (
-          <span key={src.label} className={`text-xs px-2 py-0.5 rounded-full font-medium ${SOURCE_COLORS[src.label] || 'bg-gray-50 text-gray-500'}`}>
+          <span
+            key={src.label}
+            className={`text-xs px-2 py-0.5 rounded-full font-medium ${SOURCE_COLORS[src.label] || 'bg-gray-50 text-gray-500'}`}
+          >
             {src.label} ×{src.count}
           </span>
         ))}
         <span className="text-xs text-gray-400 ml-1">auto-linked</span>
       </div>
+
+      {/* Last mention */}
       <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed border-t border-gray-100 dark:border-gray-800 pt-2">
         {entity.lastMention}
       </p>
@@ -121,8 +139,11 @@ function EntityCard({ entity }) {
 export default function EntitiesPanel() {
   const urgent = ENTITIES.filter(e => e.urgent)
   const rest   = ENTITIES.filter(e => !e.urgent)
+
   return (
     <div>
+
+      {/* Info banner */}
       <div className="flex items-center gap-2 mb-5 px-3 py-2.5 rounded-lg bg-indigo-50 dark:bg-indigo-950 border border-indigo-100 dark:border-indigo-900">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
           <circle cx="7" cy="7" r="6" stroke="#6366f1" strokeWidth="1.2"/>
@@ -132,24 +153,36 @@ export default function EntitiesPanel() {
           Entities auto-extracted and linked across all sources — zero manual tagging.
         </p>
       </div>
+
+      {/* Urgent entities */}
       {urgent.length > 0 && (
         <>
-          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Needs attention</p>
+          <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+            Needs attention
+          </p>
           <div className="grid grid-cols-1 gap-3 mb-6 sm:grid-cols-2">
             {urgent.map(e => <EntityCard key={e.id} entity={e} />)}
           </div>
         </>
       )}
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">All entities</p>
+
+      {/* All entities */}
+      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">
+        All entities
+      </p>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {rest.map(e => <EntityCard key={e.id} entity={e} />)}
       </div>
+
+      {/* Footer */}
       <div className="mt-6 flex items-center justify-center gap-1.5">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <circle cx="6" cy="6" r="5" stroke="#6366f1" strokeWidth="1"/>
           <path d="M4 6l1.5 1.5L8 4" stroke="#6366f1" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
-        <span className="text-xs text-indigo-400 font-medium">Powered by Nexus Brain · entity graph</span>
+        <span className="text-xs text-indigo-400 font-medium">
+          Powered by Nexus Brain · entity graph
+        </span>
       </div>
     </div>
   )

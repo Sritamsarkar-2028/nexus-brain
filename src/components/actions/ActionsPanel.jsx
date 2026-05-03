@@ -33,7 +33,9 @@ export default function ActionsPanel() {
   const [filter, setFilter] = useState('All')
 
   const markDone = (id) => {
-    setActions(prev => prev.map(a => a.id === id ? { ...a, urgency: 'done' } : a))
+    setActions(prev =>
+      prev.map(a => a.id === id ? { ...a, urgency: 'done' } : a)
+    )
   }
 
   const archiveAction = (id) => {
@@ -51,10 +53,14 @@ export default function ActionsPanel() {
 
   return (
     <div>
-      {nudge && <NudgeBanner nudge={nudge} onDismiss={() => setNudge(null)} />}
+      {/* Proactive nudge */}
+      {nudge && (
+        <NudgeBanner nudge={nudge} onDismiss={() => setNudge(null)} />
+      )}
 
       <StatsBar actions={actions} />
 
+      {/* Filter tabs */}
       <div className="flex items-center gap-1 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
         {FILTERS.map(f => (
           <button
@@ -80,12 +86,15 @@ export default function ActionsPanel() {
             )}
           </button>
         ))}
+
+        {/* Live sync indicator */}
         <div className="ml-auto flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs text-gray-400">Live sync</span>
         </div>
       </div>
 
+      {/* Action cards */}
       <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -109,6 +118,7 @@ export default function ActionsPanel() {
         )}
       </div>
 
+      {/* Footer */}
       <div className="mt-6 flex items-center justify-center gap-1.5">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <circle cx="6" cy="6" r="5" stroke="#6366f1" strokeWidth="1"/>

@@ -96,22 +96,31 @@ export default function ActionCard({ action, onMarkDone, onArchive }) {
       hover:shadow-sm
       ${action.urgency === 'done' ? 'opacity-60' : ''}
     `}>
+
+      {/* Card header — always visible */}
       <div
         className="flex items-start gap-3 px-4 py-3 cursor-pointer"
         onClick={() => setExpanded(v => !v)}
       >
+        {/* Avatar */}
         <div className={`w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold flex-shrink-0 ${AVATAR_COLORS[action.initials] || 'bg-indigo-100 text-indigo-700'}`}>
           {action.initials}
         </div>
+
+        {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">{action.from}</span>
+            <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
+              {action.from}
+            </span>
             <span className="text-xs text-gray-400">{action.role}</span>
             <span className={`ml-auto text-xs px-2 py-0.5 rounded-full font-medium ${cfg.badge}`}>
               {cfg.label}
             </span>
           </div>
-          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{action.subject}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
+            {action.subject}
+          </p>
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <span className="text-xs text-gray-400 bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 px-1.5 py-0.5 rounded">
               {action.source}
@@ -122,6 +131,8 @@ export default function ActionCard({ action, onMarkDone, onArchive }) {
             <span className="ml-auto text-xs text-gray-400">{action.receivedAt}</span>
           </div>
         </div>
+
+        {/* Chevron */}
         <svg
           width="14" height="14" viewBox="0 0 14 14" fill="none"
           className={`flex-shrink-0 mt-1 text-gray-400 transition-transform duration-200 ${expanded ? 'rotate-180' : ''}`}
@@ -130,8 +141,11 @@ export default function ActionCard({ action, onMarkDone, onArchive }) {
         </svg>
       </div>
 
+      {/* Expanded body */}
       {expanded && (
         <div className="px-4 pb-4 border-t border-gray-100 dark:border-gray-800">
+
+          {/* AI summary */}
           <div className="mt-3 rounded-lg bg-indigo-50 dark:bg-indigo-950 border border-indigo-100 dark:border-indigo-900 px-3 py-2.5">
             <div className="flex items-center gap-1.5 mb-1">
               <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
@@ -142,9 +156,12 @@ export default function ActionCard({ action, onMarkDone, onArchive }) {
                 Nexus analysis
               </span>
             </div>
-            <p className="text-xs text-indigo-800 dark:text-indigo-300 leading-relaxed">{action.aiSummary}</p>
+            <p className="text-xs text-indigo-800 dark:text-indigo-300 leading-relaxed">
+              {action.aiSummary}
+            </p>
           </div>
 
+          {/* Draft panel or action buttons */}
           {showDraft ? (
             <DraftPanel
               draft={action.draft}

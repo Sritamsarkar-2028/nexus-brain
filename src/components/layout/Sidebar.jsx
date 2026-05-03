@@ -1,41 +1,10 @@
 import { NAV_ITEMS, SOURCES } from '../../data/navigation'
 
-export function BottomNav({ activeTab, onTabChange }) {
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 flex items-center justify-around px-2 py-2 z-50 md:hidden">
-      {NAV_ITEMS.map((item) => (
-        <button
-          key={item.id}
-          onClick={() => onTabChange(item.id)}
-          className={`
-            relative flex flex-col items-center gap-1 px-4 py-2 rounded-xl
-            min-w-[44px] min-h-[44px] transition-colors
-            ${activeTab === item.id
-              ? 'text-indigo-600 dark:text-indigo-400'
-              : 'text-gray-400 dark:text-gray-500'
-            }
-          `}
-        >
-          {/* Dot indicator */}
-          {activeTab === item.id && (
-            <span className="absolute top-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-          )}
-          <span className="text-xs font-medium mt-1">{item.label.split(' ')[0]}</span>
-          {item.badge && (
-            <span className="absolute top-1 right-2 text-xs bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 w-4 h-4 rounded-full flex items-center justify-center font-semibold">
-              {item.badge}
-            </span>
-          )}
-        </button>
-      ))}
-    </nav>
-  )
-}
-
 export default function Sidebar({ activeTab, onTabChange }) {
   return (
     <div className="flex flex-col h-full">
 
+      {/* Nav items */}
       <div className="p-3 flex-1">
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2 mt-1">
           Workspace
@@ -63,6 +32,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
           </button>
         ))}
 
+        {/* Sources */}
         <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest px-2 mb-2 mt-5">
           Sources
         </p>
@@ -87,6 +57,7 @@ export default function Sidebar({ activeTab, onTabChange }) {
         ))}
       </div>
 
+      {/* User footer */}
       <div className="p-3 border-t border-gray-100 dark:border-gray-800">
         <div className="flex items-center gap-2.5 px-2 py-2">
           <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-xs font-semibold text-indigo-700 dark:text-indigo-300 flex-shrink-0">
