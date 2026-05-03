@@ -4,21 +4,9 @@ import ActionsPanel from './components/actions/ActionsPanel'
 import DigestPanel from './components/digest/DigestPanel'
 import EntitiesPanel from './components/entities/EntitiesPanel'
 import ChatPanel from './components/chat/ChatPanel'
-import LoginPage from './pages/LoginPage'
-import OnboardingPage from './pages/OnboardingPage'
 
-// app states: 'login' → 'onboarding' → 'app'
 function App() {
-  const [appState, setAppState] = useState('login')
   const [activeTab, setActiveTab] = useState('actions')
-
-  if (appState === 'login') {
-    return <LoginPage onLogin={() => setAppState('onboarding')} />
-  }
-
-  if (appState === 'onboarding') {
-    return <OnboardingPage onComplete={() => setAppState('app')} />
-  }
 
   return (
     <Shell activeTab={activeTab} onTabChange={setActiveTab}>
