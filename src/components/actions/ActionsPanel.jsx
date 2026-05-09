@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ACTIONS, NUDGE } from '../../data/mockData'
+import { useState, useEffect } from 'react'
+import { getActions, getNudge } from '../../services/api'
 import NudgeBanner from './NudgeBanner'
 import ActionCard from './ActionCard'
 
@@ -28,14 +28,23 @@ function StatsBar({ actions }) {
 }
 
 export default function ActionsPanel() {
-  const [actions, setActions] = useState(ACTIONS)
-  const [nudge, setNudge] = useState(NUDGE)
+  const [actions, setActions] = useState([])
+  const [nudge, setNudge] = useState(null)
   const [filter, setFilter] = useState('All')
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    Promise.all([getActions(), getNudge()])
+      .then(([actionsData, nudgeData]) => {
+        setActions(actionsData)
+        setNudge(nudgeData)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
 
   const markDone = (id) => {
-    setActions(prev =>
-      prev.map(a => a.id === id ? { ...a, urgency: 'done' } : a)
-    )
+    setActions(prev => prev.map(a => a.id === id ? { ...a, urgency: 'done' } : a))
   }
 
   const archiveAction = (id) => {
@@ -51,16 +60,22 @@ export default function ActionsPanel() {
     return true
   })
 
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-3 animate-pulse">
+        {[1, 2, 3].map(i => (
+          <div key={i} className="h-20 rounded-xl bg-gray-100 dark:bg-gray-800" />
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div>
-      {/* Proactive nudge */}
-      {nudge && (
-        <NudgeBanner nudge={nudge} onDismiss={() => setNudge(null)} />
-      )}
+      {nudge && <NudgeBanner nudge={nudge} onDismiss={() => setNudge(null)} />}
 
       <StatsBar actions={actions} />
 
-      {/* Filter tabs */}
       <div className="flex items-center gap-1 mb-4 border-b border-gray-100 dark:border-gray-800 pb-3">
         {FILTERS.map(f => (
           <button
@@ -86,15 +101,12 @@ export default function ActionsPanel() {
             )}
           </button>
         ))}
-
-        {/* Live sync indicator */}
         <div className="ml-auto flex items-center gap-1.5">
           <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span className="text-xs text-gray-400">Live sync</span>
         </div>
       </div>
 
-      {/* Action cards */}
       <div className="flex flex-col gap-3">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
@@ -118,7 +130,6 @@ export default function ActionsPanel() {
         )}
       </div>
 
-      {/* Footer */}
       <div className="mt-6 flex items-center justify-center gap-1.5">
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
           <circle cx="6" cy="6" r="5" stroke="#6366f1" strokeWidth="1"/>

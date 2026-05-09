@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
+import { chatStream } from '../../services/api'
 
 const SUGGESTED = [
-  'What did Priya last say about the Atlas API?',
+  'What are my top priorities today?',
+  'Summarize my recent emails',
   'What are the Sprint #18 blockers?',
-  'Where is the Q2 retention data?',
-  'Summarize my last 3 emails from Rahul',
+  'What needs my attention right now?',
 ]
 
 const INITIAL_MESSAGES = [
@@ -14,17 +15,6 @@ const INITIAL_MESSAGES = [
     text: 'Hi! Ask me anything about your emails, Slack messages, or docs. I search across all sources simultaneously.',
   },
 ]
-
-const MOCK_RESPONSES = {
-  'What did Priya last say about the Atlas API?':
-    'Priya\'s last message was on Slack (Apr 30, 4:12pm) — she said the spec looks good overall but needs confirmation on the auth endpoint and rate limits before the sprint starts. She also emailed this morning flagging the same two items for sign-off. The Notion spec was last updated Apr 29.',
-  'What are the Sprint #18 blockers?':
-    'Ankit flagged 3 blockers on Slack (Apr 30): loading state design on the entity graph, API error boundary UI, and the auth redirect flow. None have an assigned owner yet. Deadline is May 9.',
-  'Where is the Q2 retention data?':
-    'The retention data lives in the "Q2 Analytics" Notion page, last updated May 1 by Ankit. There\'s also a chart export in the Slack thread between you and Ankit from Apr 30. CEO Rahul asked for this in an email this morning.',
-  'Summarize my last 3 emails from Rahul':
-    'Rahul\'s last 3 emails: (1) Today 7:52am — requesting the retention slide for Q2 deck by EOD. (2) Apr 29 — asked for sprint status update before board meeting. (3) Apr 27 — shared investor deck draft for review.',
-}
 
 function Message({ message }) {
   if (message.role === 'ai') {
@@ -38,20 +28,13 @@ function Message({ message }) {
         </div>
         <div className="flex-1 bg-gray-50 dark:bg-gray-800 rounded-2xl rounded-tl-sm px-4 py-3 text-sm text-gray-700 dark:text-gray-200 leading-relaxed max-w-prose">
           {message.text}
-          {message.sources && (
-            <div className="flex gap-1.5 flex-wrap mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-              {message.sources.map(s => (
-                <span key={s} className="text-xs bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 px-2 py-0.5 rounded-full">
-                  {s}
-                </span>
-              ))}
-            </div>
+          {message.streaming && (
+            <span className="inline-block w-1 h-4 bg-indigo-400 ml-0.5 animate-pulse rounded-sm" />
           )}
         </div>
       </div>
     )
   }
-
   return (
     <div className="flex justify-end">
       <div className="bg-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-3 text-sm leading-relaxed max-w-prose">
@@ -92,39 +75,41 @@ export default function ChatPanel() {
   }, [messages, typing])
 
   const sendMessage = (text) => {
-    if (!text.trim()) return
+    if (!text.trim() || typing) return
 
     const userMsg = { id: Date.now(), role: 'user', text }
     setMessages(prev => [...prev, userMsg])
     setInput('')
     setTyping(true)
 
-    setTimeout(() => {
-      const response = MOCK_RESPONSES[text] ||
-        'I searched across Gmail, Slack, and Notion. Let me surface the most relevant context for that query — connecting to your sources now.'
+    const aiMsgId = Date.now() + 1
+    setMessages(prev => [...prev, { id: aiMsgId, role: 'ai', text: '', streaming: true }])
 
-      const aiMsg = {
-        id: Date.now() + 1,
-        role: 'ai',
-        text: response,
-        sources: ['Gmail', 'Slack', 'Notion'],
+    chatStream(
+      text,
+      (chunk) => {
+        setTyping(false)
+        setMessages(prev =>
+          prev.map(m => m.id === aiMsgId ? { ...m, text: m.text + chunk, streaming: true } : m)
+        )
+      },
+      () => {
+        setTyping(false)
+        setMessages(prev =>
+          prev.map(m => m.id === aiMsgId ? { ...m, streaming: false } : m)
+        )
       }
-      setTyping(false)
-      setMessages(prev => [...prev, aiMsg])
-    }, 1200)
+    )
   }
 
   return (
     <div className="flex flex-col h-[600px]">
-
-      {/* Messages */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-4 pb-4">
         {messages.map(m => <Message key={m.id} message={m} />)}
-        {typing && <TypingIndicator />}
+        {typing && messages[messages.length - 1]?.role !== 'ai' && <TypingIndicator />}
         <div ref={bottomRef} />
       </div>
 
-      {/* Suggested questions */}
       {messages.length === 1 && (
         <div className="mb-3">
           <p className="text-xs text-gray-400 mb-2">Suggested</p>
@@ -142,7 +127,6 @@ export default function ChatPanel() {
         </div>
       )}
 
-      {/* Input */}
       <div className="flex gap-2 pt-3 border-t border-gray-100 dark:border-gray-800">
         <input
           type="text"
@@ -154,13 +138,12 @@ export default function ChatPanel() {
         />
         <button
           onClick={() => sendMessage(input)}
-          disabled={!input.trim()}
+          disabled={!input.trim() || typing}
           className="px-4 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-medium hover:bg-indigo-700 transition-colors disabled:opacity-40"
         >
-          Ask
+          {typing ? '...' : 'Ask'}
         </button>
       </div>
-
     </div>
   )
 }
